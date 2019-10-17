@@ -1,10 +1,12 @@
 package com.example.android.databinding.basicsample.net
 
 import androidx.lifecycle.LiveData
+import com.example.android.databinding.basicsample.BuildConfig
 import com.example.android.databinding.basicsample.model.Article
 import com.example.android.databinding.basicsample.model.Banner
 import com.example.android.databinding.basicsample.model.Page
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
@@ -20,6 +22,11 @@ interface WanAPI {
         fun get() : WanAPI{
             val clientBuilder = OkHttpClient.Builder()
                     .connectTimeout(60, TimeUnit.SECONDS)
+            if(BuildConfig.DEBUG) {
+                val loggingInterceptor = HttpLoggingInterceptor()
+                loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
+                clientBuilder.addInterceptor(loggingInterceptor)
+            }
             return Retrofit.Builder()
                     .baseUrl("https://www.wanandroid.com/")
                     .client(clientBuilder.build())

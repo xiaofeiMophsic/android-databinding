@@ -16,7 +16,6 @@
 
 package com.example.android.databinding.basicsample.ui
 
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.widget.ImageView
@@ -25,12 +24,17 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import cn.bingoogolapple.bgabanner.BGABanner
-import com.bumptech.glide.Glide
 import com.example.android.databinding.basicsample.R
 import com.example.android.databinding.basicsample.data.SimpleViewModel
 import com.example.android.databinding.basicsample.databinding.PlainActivityBinding
 import com.example.android.databinding.basicsample.model.Banner
+import com.example.android.databinding.basicsample.ui.adapter.ArticleAdapter
+import com.example.android.databinding.basicsample.util.displayWithUrl
+import kotlinx.android.synthetic.main.plain_activity.*
 
 /**
  * Plain old activity with lots of problems to fix.
@@ -39,6 +43,7 @@ class PlainOldActivity : AppCompatActivity() {
 
     // Obtain ViewModel from ViewModelProviders
     private val viewModel by lazy { ViewModelProviders.of(this).get(SimpleViewModel::class.java) }
+    private lateinit var articleAdapter: ArticleAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +53,8 @@ class PlainOldActivity : AppCompatActivity() {
         // TODO: Explicitly setting initial values is a bad pattern. We'll fix that.
         binding.viewmodel = viewModel
         binding.lifecycleOwner = this
+
+        binding.refreshLayout.autoRefresh()
 
         val liveString: MutableLiveData<String> = MutableLiveData()
         liveString.observe(this, Observer { str->
@@ -65,14 +72,19 @@ class PlainOldActivity : AppCompatActivity() {
                 banner.setData(it, null)
             })
 
-            viewmodel?.loadMore()
-            viewmodel?.articles?.observe(this@PlainOldActivity, Observer {
-                Log.i("TAG", it?.datas?.toString())
-            })
+//            viewmodel?.loadMore()
         }
+        binding.recyclerView.let {
+            articleAdapter = ArticleAdapter(this)
+            it.adapter = articleAdapter
+            it.layoutManager = LinearLayoutManager(this)
+            it.addItemDecoration(DividerItemDecoration(this, (it.layoutManager as LinearLayoutManager).orientation))
+        }
+        binding.viewmodel?.articles?.observe(this, Observer {
+            it.run {
+                articleAdapter.submitList(datas)
+            }
+        })
     }
 }
 
-fun ImageView.displayWithUrl(ctx: Context, url: String?) {
-    Glide.with(ctx).load(url).into(this)
-}

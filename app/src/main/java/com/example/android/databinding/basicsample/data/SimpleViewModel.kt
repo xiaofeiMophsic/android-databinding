@@ -39,9 +39,9 @@ class SimpleViewModel : ViewModel() {
     private val _bannerLoading = MutableLiveData<Boolean>()
     private val _pageLoading = MutableLiveData<Boolean>()
 
-    private val refershTrigger = MutableLiveData<Boolean>()
+    private val refreshTrigger = MutableLiveData<Boolean>()
     private val api = WanAPI.get()
-    private val bannerList: LiveData<APIResponse<List<Banner>>> = Transformations.switchMap(refershTrigger) {
+    private val bannerList: LiveData<APIResponse<List<Banner>>> = Transformations.switchMap(refreshTrigger) {
         api.bannerList()
     }
 
@@ -61,6 +61,7 @@ class SimpleViewModel : ViewModel() {
     val articles: LiveData<Page<Article>> = Transformations.map(articleList){
         _bannerLoading.value = false
         _pageLoading.value = false
+        hasMore.value = !(it?.data?.over?:false)
         it.data
     }
 
@@ -73,7 +74,7 @@ class SimpleViewModel : ViewModel() {
 
     fun loadBanner() {
         _bannerLoading.value = true
-        refershTrigger.value = true
+        refreshTrigger.value = true
     }
 
     fun loadMore() {
