@@ -28,6 +28,9 @@ import androidx.core.widget.ImageViewCompat
 import androidx.databinding.BindingAdapter
 import com.example.android.databinding.basicsample.R
 import com.example.android.databinding.basicsample.data.Popularity
+import com.scwang.smartrefresh.layout.SmartRefreshLayout
+import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener
+import com.scwang.smartrefresh.layout.listener.OnRefreshListener
 
 /**
  * A Binding Adapter that is called whenever the value of the attribute `app:popularityIcon`
@@ -75,6 +78,31 @@ fun setProgress(progressBar: ProgressBar, likes: Int, max: Int) {
 @BindingAdapter("app:hideIfZero")
 fun hideIfZero(view: View, number: Int) {
     view.visibility = if (number == 0) View.GONE else View.VISIBLE
+}
+
+@BindingAdapter(value = ["refreshing", "moreLoading", "hasMore"], requireAll = false)
+fun bindSmartRefreshLayout(
+        smartRefreshLayout: SmartRefreshLayout,
+        refreshing: Boolean,
+        moreLoading: Boolean,
+        hasMore: Boolean
+){
+    if (!refreshing)
+        smartRefreshLayout.finishRefresh()
+    if (!moreLoading) {
+        smartRefreshLayout.finishLoadMore()
+    }
+    smartRefreshLayout.setEnableLoadMore(hasMore)
+}
+
+@BindingAdapter(value = ["onRefreshListener", "onLoadMoreListener"], requireAll = false)
+fun bindListener(
+        smartRefreshLayout: SmartRefreshLayout,
+        refreshListener: OnRefreshListener?,
+        loadMoreListener: OnLoadMoreListener?
+){
+    smartRefreshLayout.setOnRefreshListener(refreshListener)
+    smartRefreshLayout.setOnLoadMoreListener(loadMoreListener)
 }
 
 private fun getAssociatedColor(popularity: Popularity, context: Context): Int {

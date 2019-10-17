@@ -19,6 +19,7 @@
           xmlns:tools="http://schemas.android.com/tools"
           package="com.example.android.databinding.basicsample">
 
+    <uses-permission android:name="android.permission.INTERNET" />
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -32,6 +33,18 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category
+                    android:name="android.intent.category.DEFAULT" />
+
+                <category
+                    android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="talkingdata.e2a3cb97be7644f58ff5c1f2d1bf53eb"
+                    android:host="token" />
             </intent-filter>
         </activity>
         <activity android:name=".ui.SolutionActivity">
